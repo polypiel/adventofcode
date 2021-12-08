@@ -1,5 +1,3 @@
-require 'set'
-
 def buildMapping(signals)
 	mapping = Array.new(7) { "abcdefg".chars }
 	signalsBySize = Hash.new
@@ -50,8 +48,6 @@ def buildMapping(signals)
 	u0, u1 = signalsBySize[6].map { |s| s.gsub(/[#{seven}]/, "") }
 		.select { |s| s.size == 3 }
 	u = u0.gsub(/[#{u1}]/, "") + u1.gsub(/[#{u0}]/, "")
-	#puts "U: #{u}"
-	#puts "#{mapping[4]}"
 
 	mapping[4] = mapping[4].select { |c| u.include?(c) }
 	7.times do |i|
@@ -68,21 +64,17 @@ def buildMapping(signals)
 	end
 
 	numberMapping = Hash.new
-	numberMapping[(mapping[0][0] + mapping[1][0] + mapping[2][0] + mapping[4][0] + mapping[5][0] + mapping[6][0]).chars.sort.join] = 0
-	numberMapping[(mapping[2][0] + mapping[5][0]).chars.sort.join] = 1
-	numberMapping[(mapping[0][0] + mapping[2][0] + mapping[3][0] + mapping[4][0] + mapping[6][0]).chars.sort.join] = 2
-	numberMapping[(mapping[0][0] + mapping[2][0] + mapping[3][0] + mapping[5][0] + mapping[6][0]).chars.sort.join] = 3
-	numberMapping[(mapping[1][0] + mapping[2][0] + mapping[3][0] + mapping[5][0]).chars.sort.join] = 4
-	numberMapping[(mapping[0][0] + mapping[1][0] + mapping[3][0] + mapping[5][0] + mapping[6][0]).chars.sort.join] = 5
-	numberMapping[(mapping[0][0] + mapping[1][0] + mapping[3][0] + mapping[4][0] + mapping[5][0] + mapping[6][0]).chars.sort.join] = 6
-	numberMapping[(mapping[0][0] + mapping[2][0] + mapping[5][0]).chars.sort.join] = 7
-	numberMapping[(mapping[0][0] + mapping[1][0] + mapping[2][0] + mapping[3][0] + mapping[4][0] + mapping[5][0] + mapping[6][0]).chars.sort.join] = 8
-	numberMapping[(mapping[0][0] + mapping[1][0] + mapping[2][0] + mapping[3][0] + mapping[5][0] + mapping[6][0]).chars.sort.join] = 9
-	#puts numberMapping
+	numberMapping[[0, 1, 2, 4, 5, 6].map { |i| mapping[i][0] }.sort.join] = 0
+	numberMapping[[2, 5].map { |i| mapping[i][0] }.sort.join] = 1
+	numberMapping[[0, 2, 3, 4, 6].map { |i| mapping[i][0] }.sort.join] = 2
+	numberMapping[[0, 2, 3, 5, 6].map { |i| mapping[i][0] }.sort.join] = 3
+	numberMapping[[1, 2, 3, 5].map { |i| mapping[i][0] }.sort.join] = 4
+	numberMapping[[0, 1, 3, 5, 6].map { |i| mapping[i][0] }.sort.join] = 5
+	numberMapping[[0, 1, 3, 4, 5, 6].map { |i| mapping[i][0] }.sort.join] = 6
+	numberMapping[[0, 2, 5].map { |i| mapping[i][0] }.sort.join] = 7
+	numberMapping[[0, 1, 2, 3, 4, 5, 6].map { |i| mapping[i][0] }.sort.join] = 8
+	numberMapping[[0, 1, 2, 3, 5, 6].map { |i| mapping[i][0] }.sort.join] = 9
 	return numberMapping
-end
-
-def toNumber(mapping, digit)
 end
 
 sum = 0
@@ -92,10 +84,8 @@ ARGF.readlines.each do |l|
 	number = 0
 	3.downto(0) do |d|
 		o = outputs[3 - d].chars.sort.join
-		#puts "#{o} => #{numberMapping.has_key?(o)}"
 		number += numberMapping[o] * (10 ** d)
 	end
-	#puts number
 	sum += number
 end
 puts sum

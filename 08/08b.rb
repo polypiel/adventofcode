@@ -1,5 +1,17 @@
+SEGMENTS = 7
+
+def add(values, segments, mapping)
+	SEGMENTS.times do |i|
+		if (segments.include?(i))
+			mapping[i] = values
+		else
+			values.each { |v| mapping[i].delete(v) }
+		end
+	end
+end
+
 def buildMapping(signals)
-	mapping = Array.new(7) { "abcdefg".chars }
+	mapping = Array.new(SEGMENTS) { "abcdefg".chars }
 	signalsBySize = Hash.new
 	signals.each do |s| 
 		if (signalsBySize.has_key?(s.size))
@@ -11,17 +23,8 @@ def buildMapping(signals)
 
 	one = signalsBySize[2][0]
 	seven = signalsBySize[3][0]
-	signalZero = seven.gsub(/[#{one}]/, "")
-	mapping[0] = [signalZero]
-	mapping[2] = one.chars
-	mapping[5] = one.chars
-	7.times do |i|
-		if (i != 0 && i != 2 && i != 5)
-			mapping[i].delete(signalZero)
-			mapping[i].delete(one.chars[0])
-			mapping[i].delete(one.chars[1])
-		end
-	end 
+	add(one.chars, [2, 5], mapping)
+	add([seven.gsub(/[#{one}]/, "")], [0], mapping)
 
 	v0, v1 = mapping[2]
 	six = signalsBySize[6]
@@ -36,32 +39,13 @@ def buildMapping(signals)
 	end
 
 	signalThree = signalsBySize[5].map { |s| s.gsub(/[#{seven}]/, "") }.select { |s| s.size == 2 }.first
-	mapping[3] = signalThree.chars
-	mapping[6] = signalThree.chars
-	7.times do |i|
-		if (i != 3 && i != 6)
-			mapping[i].delete(signalThree[0])
-			mapping[i].delete(signalThree[1])
-		end
-	end
+	add(signalThree.chars, [3, 6], mapping)
 
 	u0, u1 = signalsBySize[6].map { |s| s.gsub(/[#{seven}]/, "") }
 		.select { |s| s.size == 3 }
 	u = u0.gsub(/[#{u1}]/, "") + u1.gsub(/[#{u0}]/, "")
-
-	mapping[4] = mapping[4].select { |c| u.include?(c) }
-	7.times do |i|
-		if (i != 4)
-			mapping[i].delete(mapping[4][0])
-		end
-	end
-
-	mapping[3] = mapping[3].select { |c| u.include?(c) }
-	7.times do |i|
-		if (i != 3)
-			mapping[i].delete(mapping[3][0])
-		end
-	end
+	add(mapping[4].select { |c| u.include?(c) }, [4], mapping)
+	add(mapping[3].select { |c| u.include?(c) }, [3], mapping)
 
 	numberMapping = Hash.new
 	numberMapping[[0, 1, 2, 4, 5, 6].map { |i| mapping[i][0] }.sort.join] = 0
@@ -88,4 +72,5 @@ ARGF.readlines.each do |l|
 	end
 	sum += number
 end
+
 puts sum

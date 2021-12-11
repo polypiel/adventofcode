@@ -4,34 +4,22 @@ SIZE = 10
 STEPS = 100
 
 octopuses = Array.new(SIZE) { Array.new(SIZE)}
-
-def getNeighbours(pos)
-	x = pos / SIZE
-	y = pos % SIZE
-	return [
+NEIGHBOURS = Hash.new 
+(SIZE * SIZE).times { |i|
+	x = i / SIZE
+	y = i % SIZE
+	NEIGHBOURS[i] = [
 		[x - 1, y - 1], [x, y - 1], [x + 1, y - 1],
 		[x - 1, y], [x + 1, y],
 		[x - 1, y + 1], [x, y + 1], [x + 1, y + 1]
 	]
 		.select { |p| p[0] >= 0 && p[0] < SIZE && p[1] >= 0 && p[1] < SIZE }
 		.map { |p| SIZE * p[0] + p[1] }
-end
-
-def pp(octopuses)
-	SIZE.times do |i|
-		SIZE.times do |j|
-			print "#{octopuses[i][j]}"
-		end
-		puts ""
-	end
-	puts ""
-end
+}
 
 ARGF.readlines.each_with_index do |l, i|
 	octopuses[i] = l.chomp.split("").map { |c| c.to_i }
 end
-
-pp(octopuses)
 
 flashes = 0
 STEPS.times do |i|
@@ -50,8 +38,7 @@ STEPS.times do |i|
 	remainingNines = nines.to_a
 	while (!remainingNines.empty?)
 		aNine = remainingNines.pop()
-		neighbours = getNeighbours(aNine)
-		neighbours.each do |n|
+		NEIGHBOURS[aNine].each do |n|
 			x = n / SIZE
 			y = n % SIZE
 			octopuses[x][y] += 1

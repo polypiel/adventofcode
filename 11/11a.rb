@@ -28,12 +28,10 @@ STEPS.times do |i|
 		x = j / SIZE
 		y = j % SIZE
 		octopuses[x][y] += 1
-		#puts "#{x},#{y}=#{octopuses[x][y]}"
 		if (octopuses[x][y] == 10)
 			nines << j
 		end
 	end
-	#puts "Nines: #{nines}"
 
 	remainingNines = nines.to_a
 	while (!remainingNines.empty?)

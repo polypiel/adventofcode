@@ -21,7 +21,6 @@ end
 ARGF.readline.chomp.split(",").each do |n|
 	n0 = n.to_i
 	fn = f(n0 - 9)
-	#puts "#{n0} -> #{fn}"
 	lanternfishes += fn
 end
 

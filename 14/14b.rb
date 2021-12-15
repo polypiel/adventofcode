@@ -33,21 +33,15 @@ STEPS.times do |step|
 		end
 	end
 	pairs = currentPairs
-	#puts "#{step+1}: #{pairs}"
 end
 
 elements = Hash.new
 pairs.each do |prefix, amount|
-	a, b = prefix.chars
+	a, _ = prefix.chars
 	elements[a] = elements.has_key?(a) ? elements[a] + amount : amount
-	# elements[b] = elements.has_key?(b) ? elements[b] + amount : amount
 end
 lastLetter = template[template.size - 1]
 elements[lastLetter] = elements.has_key?(lastLetter) ? elements[lastLetter] + 1 : 1
 
-max = elements.values.max
-min = elements.values.min
-#puts "#{max} - #{min}"
-res = max - min
-
+res = elements.values.max - elements.values.min
 puts res

@@ -16,7 +16,6 @@ STEPS.times do |step|
 			string += template[i]
 		else
 			prefix = template[i, 2]
-			#puts "prefix #{prefix}"
 			if(rules.has_key?(prefix))
 				string += prefix[0] + rules[prefix]
 			else
@@ -25,20 +24,13 @@ STEPS.times do |step|
 		end
 	end
 	template = string
-	#puts template
 end
 
-elements = Hash.new
+elements = Hash.new(1)
 template.chars.each do |c|
-	if (elements.has_key? c)
-		elements[c] += 1
-	else
-		elements[c] = 1
-	end
+	elements[c] += 1
 end
 
-max = elements.values.max
-min = elements.values.min
-res = max - min
+res = elements.values.max - elements.values.min
 
 puts res

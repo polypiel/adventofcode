@@ -9,39 +9,35 @@ ARGF.readlines.map { |l| l.chomp.split(" -> ") }.each do |l, r|
 	rules[l] = r
 end
 
-pairs = Hash.new
+pairs = Hash.new(0)
 (template.size - 1).times do |i|
 	prefix = template[i, 2]
-	if (pairs.has_key?(prefix))
-		pairs[prefix] += 1
-	else
-		pairs[prefix] = 1
-	end
+	pairs[prefix] += 1
 end
 
 STEPS.times do |step|
-	currentPairs = Hash.new
+	currentPairs = Hash.new(0)
 	pairs.each do |prefix, amount|
 		if (rules.has_key?(prefix))
 			rule = rules[prefix]
 			pair1 = prefix[0] + rule
 			pair2 = rule + prefix[1]
-			currentPairs[pair1] = currentPairs.has_key?(pair1) ? currentPairs[pair1] + amount : amount
-			currentPairs[pair2] = currentPairs.has_key?(pair2) ? currentPairs[pair2] + amount : amount
+			currentPairs[pair1] += amount
+			currentPairs[pair2] += amount
 		else
-			currentPairs[prefix] = currentPairs.has_key?(prefix) ? currentPairs[prefix] + amount : amount
+			currentPairs[prefix] += amount
 		end
 	end
 	pairs = currentPairs
 end
 
-elements = Hash.new
+elements = Hash.new(0)
 pairs.each do |prefix, amount|
 	a, _ = prefix.chars
-	elements[a] = elements.has_key?(a) ? elements[a] + amount : amount
+	elements[a] += amount
 end
 lastLetter = template[template.size - 1]
-elements[lastLetter] = elements.has_key?(lastLetter) ? elements[lastLetter] + 1 : 1
+elements[lastLetter] += 1
 
 res = elements.values.max - elements.values.min
 puts res

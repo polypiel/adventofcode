@@ -2,7 +2,7 @@ require 'set'
 
 SIZE = 10
 
-octopuses = Array.new(SIZE) { Array.new(SIZE)}
+octopuses = Array.new(SIZE) { Array.new(SIZE) }
 
 NEIGHBOURS = Hash.new 
 (SIZE * SIZE).times { |i|

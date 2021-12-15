@@ -1,9 +1,9 @@
-$num_bits = 12
-$masks = Array.new($num_bits) { |i| 2**($num_bits - i - 1) }
+NUM_BITS = 12
+$masks = Array.new(NUM_BITS) { |i| 2**(NUM_BITS - i - 1) }
 
 def check(measures, mul = 1)
-   ones = Array.new($num_bits) { 0 }
-   $num_bits.times do |i|
+   ones = Array.new(NUM_BITS, 0)
+   NUM_BITS.times do |i|
       ones = 0
       measures.each do |m|
          ones += mul * ((m & $masks[i]) == 0 ? 1 : -1)

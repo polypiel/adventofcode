@@ -1,8 +1,7 @@
-$matrix = Hash.new
+$matrix = Hash.new(0)
 
 def add(x, y)
-	key = "#{x}-#{y}"
-	$matrix[key] = $matrix.has_key?(key) ? $matrix[key] + 1 : 1
+	$matrix["#{x}-#{y}"] += 1
 end
 
 ARGF.readlines.each do |line|

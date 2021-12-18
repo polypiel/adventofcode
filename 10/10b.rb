@@ -1,7 +1,5 @@
 require 'set'
 
-sum = 0
-
 OPEN = "([{<".chars.to_set
 CLOSE = {
 	"(" => ")",

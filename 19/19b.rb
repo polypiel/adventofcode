@@ -55,11 +55,9 @@ ROTATE_X.each do |rx|
 		end
 	end
 end
-#puts "#{$rotations.size} rotations"
 $rotations = $rotations.to_set.to_a
 
-#puts "#{$rotations.size} unique rotations"
-
+# TODO remove, use array instead
 Beacon = Struct.new(:v) do
 	def to_s
 		"#{v[0]},#{v[1]},#{v[2]}"
@@ -95,7 +93,7 @@ Scanner = Struct.new(:beacons, :center) do
 		Scanner.new(beacons.map { |c| c.translate(dx, dy, dz) }, [dx, dy, dz])
 	end
 
-	def nextTo?(otherScanner)
+	def findNextTo(otherScanner)
 		rotateAll.each do |rs|
 			rs.beacons.each_with_index do |c1, i|
 				otherScanner.beacons.each_with_index do |c2, j|
@@ -139,11 +137,9 @@ i = 0
 while (!scanners.empty?)
 	i = (i + 1) % scanners.size
 	canditate = scanners[i]
-	#puts "Trying #{i}..."
 	scannersSystem.each do |s1|
-		rs = canditate.nextTo? s1
+		rs = canditate.findNextTo(s1)
 		if (rs != nil)
-			puts "Found #{scannersSystem.size}!"
 			scannersSystem << rs
 			scanners.delete_at(i)
 			break
@@ -151,23 +147,16 @@ while (!scanners.empty?)
 	end
 end
 
-#puts scannersSystem.size
-#puts scannersSystem
-
 uniqueCoordinates = Set.new
 allCoordinates = Array.new
 scannersSystem.each do |s|
-	#puts "Scanner"
-	#puts "#{s.beacons}"
 	s.beacons.each do |c|
 		allCoordinates << c
 		uniqueCoordinates << c
 	end
 end
 
-#puts allCoordinates.size
 puts uniqueCoordinates.size
-#puts "#{allCoordinates.size - uniqueCoordinates.size}"
 
 maxDistance = 0
 scannersSystem.each_with_index do |s1, i|
@@ -180,4 +169,4 @@ scannersSystem.each_with_index do |s1, i|
 		end
 	end
 end
-puts maxDistance
+puts maxDifindNtance

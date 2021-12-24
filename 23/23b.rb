@@ -3,11 +3,11 @@ A = 0
 B = 1
 C = 2
 D = 3
-SOL = [A, A, B, B, C, C, D, D]
+SOL = [A, A, A, A, B, B, B, B, C, C, C, C, D, D, D, D]
 MUL = [1, 10, 100, 1000]
 
 ROOMS = 4
-ROOM_SIZE = 2
+ROOM_SIZE = 4
 HALLWAYS = 11
 
 OUTWARDS = 0
@@ -17,18 +17,51 @@ DIRECT = 2
 $better = nil
 $cache = Hash.new
 
-hallway = Array.new(11, EMPTY)
-rooms = Array.new(8, EMPTY)
+hallway = Array.new(HALLWAYS, EMPTY)
+rooms = Array.new(ROOMS * ROOM_SIZE, EMPTY)
 
-#rooms = [A, B, D, C, C, B, A, D] # input test
-rooms = [B, C, C, B, D, A, A, D] # input
+#rooms = [A, D, D, B, D, B, C, C, C, A, B, B, A, C, A, D] # input test b
+rooms = [B, D, D, C, C, B, C, B, D, A, B, A, A, C, A, D] # input b
 
 def distance(r, h, type)
 	hx = h
-	hy = 2
-	rx = (r / 2) * 2 + 2
+	hy = ROOM_SIZE
+	rx = (r / ROOM_SIZE) * 2 + 2
 	ry = r % ROOM_SIZE
 	return ((rx - hx).abs + (ry - hy).abs) * MUL[type]
+end
+
+def tipNoR(rooms, r)
+	tip = nil
+	rs = 0
+	(r * ROOM_SIZE + ROOM_SIZE - 1).downto(r * ROOM_SIZE) do |rj|
+		if (rooms[rj] == EMPTY)
+			next
+		elsif (tip == nil)
+			if (rooms[rj] != r)
+				return rj
+			else
+				tip = rj
+			end
+		elsif (rooms[rj] != r)
+			rs += 1
+		end
+	end
+	tip && rs > 0 ? tip : nil
+end
+
+def firstEmptyR(rooms, r)
+	tip = nil
+	(r * ROOM_SIZE + ROOM_SIZE - 1).downto(r * ROOM_SIZE) do |rj|
+		if (rooms[rj] == EMPTY)
+			next
+		elsif (rooms[rj] == r && tip == nil)
+			tip = rj + 1
+		elsif (rooms[rj] != r)
+			return nil
+		end
+	end
+	tip != nil ? tip : r * ROOM_SIZE
 end
 
 # [type, room, hallway/room]
@@ -36,30 +69,17 @@ def fetchMovements(rooms, hallway)
 	movements = []
 	# Direct
 	ROOMS.times do |r|
-		ri = 2 * r
-		if (rooms[ri] != EMPTY && rooms[ri + 1] != EMPTY && rooms[ri + 1] != r)
-			ri += 1
-		elsif (rooms[ri] != EMPTY && rooms[ri] != r && rooms[ri + 1] == EMPTY)
-			ri += 0
-		else
-			next
-		end
-		dr = rooms[ri] * 2
-		if (rooms[dr] == EMPTY && rooms[dr + 1] == EMPTY)
-			dr += 0
-		elsif (rooms[dr] == rooms[ri] && rooms[dr + 1] == EMPTY)
-			dr += 1
-		else
-			next
-		end
-
-		rix = 2 * r + 2
+		ri = tipNoR(rooms, r)
+		next if ri == nil
+		targetRoom = firstEmptyR(rooms, rooms[ri])
+		next if targetRoom == nil
+		rix = r * 2 + 2
 		drx = rooms[ri] * 2 + 2
 		min = [rix,drx].min
 		max = [rix,drx].max
 		free = (min..max).to_a.all? { |i| hallway[i] == EMPTY }
 		if (free)
-			movements << [DIRECT, ri, dr]
+			movements << [DIRECT, ri, targetRoom]
 		end
 	end
 
@@ -67,34 +87,26 @@ def fetchMovements(rooms, hallway)
 	HALLWAYS.times do |h|
 		if (hallway[h] != EMPTY)
 			r = hallway[h]
-			ri = 2 * r
-			if (rooms[ri] == EMPTY || (rooms[ri + 1] == EMPTY && rooms[ri] == r))
-				ri += 1 if (rooms[ri] != EMPTY)
-				rix = r * 2 + 2
-				if (h < rix)
-					free = (h+1..rix).to_a.all? { |j| hallway[j] == EMPTY }
-				else
-					free = (rix..h-1).to_a.all? { |j| hallway[j] == EMPTY }
-				end
-				if (free)
-					movements << [INWARDS, ri, h] 
-				end
+			ri = firstEmptyR(rooms, r)
+			next if ri == nil
+			rix = r * 2 + 2
+			if (h < rix)
+				free = (h+1..rix).to_a.all? { |j| hallway[j] == EMPTY }
+			else
+				free = (rix..h-1).to_a.all? { |j| hallway[j] == EMPTY }
+			end
+			if (free)
+				movements << [INWARDS, ri, h] 
 			end
 		end
 	end
 
 	# Outwards
 	ROOMS.times do |r|
-		ri = 2 * r
-		if (rooms[ri + 1] != EMPTY && (rooms[ri + 1] != r || rooms[ri] != r))
-			ri += 1
-		elsif (rooms[ri] != EMPTY && rooms[ri] != r)
-			ri += 0
-		else
-			next
-		end
+		ri = tipNoR(rooms, r)
+		next if ri == nil
 		hi = r * 2 + 2
-		(hi..10).each do |i|
+		(hi..HALLWAYS-1).each do |i|
 			break if hallway[i] != EMPTY
 			if (i != 2 && i != 4 && i != 6 && i != 8)
 				movements << [OUTWARDS, ri, i]
@@ -107,6 +119,7 @@ def fetchMovements(rooms, hallway)
 			end
 		end
 	end
+
 	return movements
 end
 
@@ -159,14 +172,13 @@ end
 def ppState(rooms, hallway)
 	hallway.each { |h| print ppCase h }
 	puts
-	print "  "
 	(ROOM_SIZE-1).downto(0) do |j|
+		print "  "
 		rooms.each_with_index do |r, i| 
 			print "#{ppCase(r)} " if (i % ROOM_SIZE == j) 
 		end
 		puts
 	end
-	puts
 end
 
 def ppMovement(m)
@@ -183,6 +195,4 @@ def ppMovement(m)
 end
 
 amphipods(rooms, hallway)
-puts $better
-
-#fetchMovements(rooms, hallway).each { |mi| ppMovement(mi) }
+puts "Best: #{$better}"

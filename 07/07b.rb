@@ -8,9 +8,8 @@ initial.size.times do |i|
 		c0 = (c  - i - 1).abs
 		current += ((c0 * c0) + c0) / 2
 	end
-	if (better == -1 || current < better)
-		better = current
-	end
+	
+	better = current if (better == -1 || current < better)
 end
 
 puts better

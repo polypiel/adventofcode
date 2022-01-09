@@ -13,4 +13,4 @@ STDIN.read.split("\n").each do |a|
       y += aim * amount.to_i
    end
 end
-puts x*y
+puts x * y

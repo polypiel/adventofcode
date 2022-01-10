@@ -135,7 +135,6 @@ i = 0
 while (!scanners.empty?)
 	i = (i + 1) % scanners.size
 	canditate = scanners[i]
-	#puts "Trying #{i}..."
 	scannersSystem.each do |s1|
 		rs = canditate.nextTo? s1
 		if (rs != nil)
@@ -147,20 +146,11 @@ while (!scanners.empty?)
 	end
 end
 
-#puts scannersSystem.size
-#puts scannersSystem
-
 uniqueCoordinates = Set.new
-allCoordinates = Array.new
 scannersSystem.each do |s|
-	#puts "Scanner"
-	#puts "#{s.beacons}"
 	s.beacons.each do |c|
-		allCoordinates << c
 		uniqueCoordinates << c
 	end
 end
 
-#puts allCoordinates.size
 puts uniqueCoordinates.size
-#puts "#{allCoordinates.size - uniqueCoordinates.size}"
